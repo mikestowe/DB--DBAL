@@ -32,9 +32,12 @@ class DB_Inc_Abstracts_DataHandler
 		$className = self::className();
 		if(method_exists($className, $method)) {
 			$database = $this->_database;
+			$randKey = time();
+			$this->saveConnectionAs('__internals__DataHandler_' . $randKey . $database . $this->_query['table']['name']);
 			$obj = new $className($this);
 			$obj->$method();
 			$this->_data['new'] = $obj->returnData();
+			$this->useConnection('__internals__DataHandler_' . $randKey . $database . $this->_query['table']['name']);
 			$this->db($database);
 		}
 		
