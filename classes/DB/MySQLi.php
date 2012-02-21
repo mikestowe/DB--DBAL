@@ -178,7 +178,7 @@ class DB_MySQLi extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_Dat
 			}
 			
 			
-		       if(isset($this->_query['orderby']) && is_array($this->_query['orderby'])) {
+		    if(isset($this->_query['orderby']) && is_array($this->_query['orderby'])) {
 			    $query .= ' ORDER BY';
 			    foreach($this->_query['orderby'] as $orderby) {
 					$query .= ' '.$orderby.',';
