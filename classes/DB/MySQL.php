@@ -3,6 +3,7 @@
  *
  * MySQL Router
  * Determines whether or not to use MySQLi
+ * and reroutes all data accordingly
  * 
  * @author mstowe
  *
