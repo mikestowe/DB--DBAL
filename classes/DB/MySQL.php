@@ -15,8 +15,8 @@ class DB_MySQL extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_Data
         
         if(count($arg) == 4) {
             $connection = mysql_connect($arg[0], $arg[1]. $arg[2]);
-            mysql_select_db($arg[4]);
-            parent::saveDatabase($arg[4]);
+            mysql_select_db($arg[3]);
+            parent::saveDatabase($arg[3]);
         } elseif(count($arg) == 3) {
             $connection = mysql_connect($arg[0], $arg[1]. $arg[2]);
         } else {
@@ -66,7 +66,7 @@ class DB_MySQL extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_Data
 		
 		if(is_array($this->_query['data']) && count($this->_query['data']) > 0) {
 			foreach($this->_query['data'] as $k => $v) {
-				$query .= ' '.$k.' = "'.mysql_real_escape_string($v).'",';
+				$query .= ' '.$k.' = "'.$this->quote($v).'",';
 				if($getOldData && parent::getData($k, 'old') != $v) {
 					parent::saveData($k, array('old' => parent::getData($k, 'old'), 'new' => $v), 'changed');
 				}
@@ -92,7 +92,7 @@ class DB_MySQL extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_Data
 		}
 		
 		parent::setQuerySQL($query);
-		$result = mysql_query($query);
+		$result = $this->doRawQuery($query);
 		
 		if($this->_query['type'] == 'insert') {
 			parent::setInsertId(mysql_insert_id());
@@ -198,5 +198,22 @@ class DB_MySQL extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_Data
 	
 	public function doRawQuery($query) {
 		return mysql_query($query);
+	}
+	
+	/* TRANSACTION FUNCTIONS */
+	
+	public function startTransaction() {
+		$this->doRawQuery('SET AUTOCOMMIT=0');
+		$this->doRawQuery('START TRANSACTION');
+	}
+	
+	public function rollback() {
+		$this->doRawQuery('ROLLBACK');
+		$this->doRawQuery('SET AUTOCOMMIT=1');
+	}
+	
+	public function commit() {
+		$this->doRawQuery('COMMIT');
+		$this->doRawQuery('SET AUTOCOMMIT=1');
 	}
 }

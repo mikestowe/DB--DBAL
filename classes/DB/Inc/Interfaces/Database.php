@@ -10,5 +10,10 @@ interface DB_Inc_Interfaces_Database
     public function doFetch();
     public function execute($getOldData);
     public function doRawQuery($query);
+    
+    // Transactions
+    public function startTransaction();
+    public function rollback();
+    public function commit();
 
 }
