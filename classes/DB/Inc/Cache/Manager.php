@@ -1,9 +1,9 @@
 <?php
-
 class DB_Inc_Cache_Manager {
-	
-	const DB_INC_CACHE_MANAGER_CONST = 'DB_DBAL_CACHE_';
+
+	const keyPrefix = 'DB_DBAL_CACHE_';
 	private $_doCache = false;
+	private $_instance;
 	private $_cache = array();
 	private $_files = array();
 	private $_pkeys = array();
@@ -15,45 +15,61 @@ class DB_Inc_Cache_Manager {
 		}
 	}
 	
+	private function _doCache()
+	{
+		if(is_null($this->_doCache)) {
+			$this->_doCache = false;
+			if(function_exists('apc_fetch')) {
+				$this->_getCacheSystem('APC');
+				
+			}
+		}
+		
+		return $this->_doCache;
+	}
+	
+	private function _getCacheSystem($name)
+	{
+		require_once('Interface.php');
+		require_once($name . '.php');
+		
+		$name = 'DB_Inc_Cache_' . $name;
+		$this->_instance = new $name;
+		
+		$this->_doCache = true;
+	}
+	
+	public function useCache($name)
+	{
+		$this->_getCacheSystem($name);
+		return $this;
+	}
+	
 	public function getCache($db, $table, $key)
 	{
-		if(!$this->_doCache) { 
+		if(!$this->_doCache()) { 
 			if(isset($this->_cache[$db][$table][$key])) {
 				return;
 			}
 			return false;
 		}
 		
-		$key = DB_INC_CACHE_MANAGER_CONST . $db . '_' . $table;
-		$r = apc_fetch($key);
-		
-		if($r && isset($r[$key])) {
-			return $r[$key];
-		}
-		
-		return false;
+		return $this->_instance->getCache($db, $table, $key);
 	}
 	
 	public function setCache($db, $table, $key, $data)
 	{
-		if(!$this->_doCache) { 
+		if(!$this->_doCache()) { 
 			$this->_cache[$db][$table][$key] = $data;
 			return false; 
 		}
 		
-		$key = DB_INC_CACHE_MANAGER_CONST . $db . '_' . $table;
-		$r = apc_fetch($key);
-		
-		if($r) {
-			$r[$key] = $data;
-		}
-		
-		apc_store($key, $r);
+		return $this->_instance->setCache($db, $table, $key, $data);
 	}
 	
 	public function clearCache($db, $table)
 	{
-		if(!$this->_doCache) { 
+		if(!$this->_doCache()) { 
 			if(isset($this->_cache[$db][$table])) {
 				unset($this->_cache[$db][$table]);
 				return;
@@ -61,60 +77,50 @@ class DB_Inc_Cache_Manager {
 			return false; 
 		}
 		
-		$key = DB_INC_CACHE_MANAGER_CONST . $db . '_' . $table;
-		apc_delete($key);
+		return $this->_instance->clearCache($db, $table);
 	}
 	
 	public function setPrimaryKey($db, $table, $column) {
-		if(!$this->_doCache) { 
+		if(!$this->_doCache()) { 
 			$this->_pkeys[$db][$table] = $column;
 			return false; 
 		}
 		
-		$key = DB_INC_CACHE_MANAGER_CONST . $db . '_' . $table . '_PrimaryKey';
-		
-		apc_store($key, $column);
+		return $this->_instance->setPrimaryKey($db, $table, $column);
 	}
 	
 	public function getPrimaryKey($db, $table)
 	{
-		if(!$this->_doCache) { 
+		if(!$this->_doCache()) { 
 			if(isset($this->_pkeys[$db][$table])) {
 				return $this->_pkeys[$db][$table];
 			}
 			return false; 
 		}
 		
-		$key = DB_INC_CACHE_MANAGER_CONST . $db . '_' . $table . '_PrimaryKey';
-		$column = apc_fetch($key);
-		
-		return $column;
+		return $this->_instance->getPrimaryKey($db, $table);
 	}
 	
 	public function setFileStatus($db, $table, $status)
 	{
-		if(!$this->_doCache) { 
+		if(!$this->_doCache()) { 
 			$this->_files[$db][$table] = $status;
 			return false; 
 		}
 		
-		$key = DB_INC_CACHE_MANAGER_CONST . $db . '_' . $table . '_File';
-		apc_store($key, $status);
+		return $this->_instance->setFileStatus($db, $table, $status);
 	}
 	
 	public function getFileStatus($db, $table)
 	{
-		if(!$this->_doCache) { 
+		if(!$this->_doCache()) { 
 			if(isset($this->_files[$db][$table])) {
 				return $this->_files[$db][$table];
 			}
 			return false; 
 		}
 		
-		$key = DB_INC_CACHE_MANAGER_CONST . $db . '_' . $table . '_File';
-		$status = apc_fetch($key);
-		
-		return $status;
+		return $this->_instance->getFileStatus($db, $table);
 	}
 	
 	
@@ -122,5 +128,10 @@ class DB_Inc_Cache_Manager {
 	public function makeKey($input)
 	{
 		return md5($input);
+	}
+	
+	public function __call($function, $args)
+	{
+		return call_user_func_array(array($this->_instance,$function), $args);
 	}
 }
