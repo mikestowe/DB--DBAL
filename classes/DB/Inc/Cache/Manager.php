@@ -49,7 +49,7 @@ class DB_Inc_Cache_Manager {
 	{
 		if(!$this->_doCache()) { 
 			if(isset($this->_cache[$db][$table][$key])) {
-				return;
+				return $this->_cache[$db][$table][$key];
 			}
 			return false;
 		}
