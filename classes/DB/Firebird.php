@@ -65,7 +65,7 @@ class DB_Firebird extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_D
 		
 		if(is_array($this->_query['data']) && count($this->_query['data']) > 0) {
 			foreach($this->_query['data'] as $k => $v) {
-				$query .= ' '.$k.' = "'.$this->quote($v).'",';
+				$query .= ' '.$k.' = \''.$this->quote($v).'\',';
 				if($getOldData && parent::getData($k, 'old') != $v) {
 					parent::saveData($k, array('old' => parent::getData($k, 'old'), 'new' => $v), 'changed');
 				}
@@ -127,10 +127,10 @@ class DB_Firebird extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_D
 		} else {
 			$primaryKey = $this->getPrimaryKey();
 			if(!$primaryKey) {
-				$r = $this->doRawQuery('SHOW INDEX FROM `' . $this->_query['table']['name'] . '` WHERE Key_name = "PRIMARY"');
+				$r = $this->doRawQuery('select RDB$FIELD_POSITION,RDB$FIELD_NAME from rdb$index_segments where RDB$INDEX_NAME = (select RDB$INDEX_NAME from RDB$RELATION_CONSTRAINTS where rdb$relation_name = \'' . $this->_query['table']['name'] . '\' and RDB$CONSTRAINT_TYPE = \'PRIMARY KEY\') order by RDB$FIELD_POSITION');
 				if(ibase_num_rows($r) == 1) {
 					$o = ibase_fetch_object($r);
-					$primaryKey = $o->Column_name;
+					$primaryKey = $o->FIELD_NAME;
 					$this->setPrimaryKey($primaryKey);
 				}
 			}
