@@ -196,11 +196,11 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler
     	return DB::cacheManager()->setCache($this->_database, $this->_query['table']['name'], DB::cacheManager()->makeKey($query), $data);
     }
     
-    public function getPrimaryKey() {
+    protected function getCachedPrimaryKey() {
     	return DB::cacheManager()->getPrimaryKey($this->_database, $this->_query['table']['name']);
     }
     
-    public function setPrimaryKey($column) {
+    protected function setCachedPrimaryKey($column) {
     	return DB::cacheManager()->setPrimaryKey($this->_database, $this->_query['table']['name'], $column);
     }
     

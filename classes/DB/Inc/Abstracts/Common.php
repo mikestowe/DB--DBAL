@@ -180,6 +180,11 @@ class DB_Inc_Abstracts_Common extends DB_Inc_Abstracts_Internals implements DB_I
         return $this;
     }
     
+    public function find($value) {
+        return $this->where($this->getPrimaryKey() . ' = "?"', $value)
+                    ->fetchOne();
+    }
+    
     public function fetch($start=null ,$records=null) {
         $this->limit($start,$records);
         $this->_query['format'] = 'array';

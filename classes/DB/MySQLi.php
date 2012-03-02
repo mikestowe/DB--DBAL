@@ -125,19 +125,9 @@ class DB_MySQLi extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_Dat
 				$this->setCache($this->getQuerySql(), $data);
 			}
 		} else {
-			$primaryKey = $this->getPrimaryKey();
-			if(!$primaryKey) {
-				$r = $this->doRawQuery('SHOW INDEX FROM `' . $this->_query['table']['name'] . '` WHERE Key_name = "PRIMARY"');
-				if(mysqli_num_rows($r) == 1) {
-					$o = mysqli_fetch_object($r);
-					$primaryKey = $o->Column_name;
-					$this->setPrimaryKey($primaryKey);
-				}
-			}
-			
 			$result = array();
 			while($tmp = mysqli_fetch_object($this->_resource)) {
-				$result[] = parent::newDataSet($primaryKey, $tmp);
+				$result[] = parent::newDataSet($this->getPrimaryKey(), $tmp);
 			}
 			
 			parent::setCount(count($result));
@@ -194,6 +184,19 @@ class DB_MySQLi extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_Dat
 			$this->setQuerySQL($query);
 		}
 	}
+
+    public function getPrimaryKey() {
+        $primaryKey = $this->getCachedPrimaryKey();
+        if(!$primaryKey) {
+            $r = $this->doRawQuery('SHOW INDEX FROM `' . $this->_query['table']['name'] . '` WHERE Key_name = "PRIMARY"');
+            if(mysqli_num_rows($r) == 1) {
+                $o = mysqli_fetch_object($r);
+                $primaryKey = $o->Column_name;
+                $this->setCachedPrimaryKey($primaryKey);
+            }
+        }
+        return $primaryKey;
+    }
 	
 	public function doRawQuery($query) {
 	    $this->profilerStartRecording();

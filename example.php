@@ -7,6 +7,10 @@ DB::MySQL('localhost','root','')->saveConnectionAs('default');
 
 DB::MySQL()->profilerStart();
 
+// Find Using Primary Key
+$a = DB::MySQL()->db('DBAL')->table('test')->find(1);
+echo $a->name . '<hr />';
+
 // Find Using Magic Find Method
 $a = DB::MySQL()->db('DBAL')->table('test')->findByName('Bob');
 echo $a[0]->name . '<hr />';

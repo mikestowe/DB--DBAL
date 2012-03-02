@@ -125,19 +125,9 @@ class DB_Firebird extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_D
 				$this->setCache($this->getQuerySql(), $data);
 			}
 		} else {
-			$primaryKey = $this->getPrimaryKey();
-			if(!$primaryKey) {
-				$r = $this->doRawQuery('select RDB$FIELD_POSITION,RDB$FIELD_NAME from rdb$index_segments where RDB$INDEX_NAME = (select RDB$INDEX_NAME from RDB$RELATION_CONSTRAINTS where rdb$relation_name = \'' . $this->_query['table']['name'] . '\' and RDB$CONSTRAINT_TYPE = \'PRIMARY KEY\') order by RDB$FIELD_POSITION');
-				if(ibase_num_rows($r) == 1) {
-					$o = ibase_fetch_object($r);
-					$primaryKey = $o->FIELD_NAME;
-					$this->setPrimaryKey($primaryKey);
-				}
-			}
-			
 			$result = array();
 			while($tmp = ibase_fetch_object($this->_resource)) {
-				$result[] = parent::newDataSet($primaryKey, $tmp);
+				$result[] = parent::newDataSet($this->getPrimaryKey(), $tmp);
 			}
 			
 			parent::setCount(count($result));
@@ -200,6 +190,19 @@ class DB_Firebird extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_D
 			$this->setQuerySQL($query);
 		}
 	}
+
+    public function getPrimaryKey() {
+        $primaryKey = $this->getCachedPrimaryKey();
+        if(!$primaryKey) {
+            $r = $this->doRawQuery('select RDB$FIELD_POSITION,RDB$FIELD_NAME from rdb$index_segments where RDB$INDEX_NAME = (select RDB$INDEX_NAME from RDB$RELATION_CONSTRAINTS where rdb$relation_name = \'' . $this->_query['table']['name'] . '\' and RDB$CONSTRAINT_TYPE = \'PRIMARY KEY\') order by RDB$FIELD_POSITION');
+            if(ibase_num_rows($r) == 1) {
+                $o = ibase_fetch_object($r);
+                $primaryKey = $o->FIELD_NAME;
+                $this->setCachedPrimaryKey($primaryKey);
+            }
+        }
+        return $primaryKey;
+    }
 	
 	public function doRawQuery($query) {
 	    $this->profilerStartRecording();
