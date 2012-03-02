@@ -34,5 +34,27 @@ class DB_Inc_Profiler_Profiler {
     {
         unset($this->_stack[$db]);
     }
+    
+    public function getQueriesLargerThan($db, $memory) {
+        $queries = array();
+        foreach(self::getStack($db) as $tmp) {
+            if($tmp->getMemoryUsed() > $memory) {
+                $queries[] = $tmp;
+            }
+        }
+        
+        return $queries;
+    }
+    
+    public function getQueriesLongerThan($db, $seconds) {
+        $queries = array();
+        foreach(self::getStack($db) as $tmp) {
+            if($tmp->getExecutionTime() > $seconds) {
+                $queries[] = $tmp;
+            }
+        }
+        
+        return $queries;
+    }
 }
     

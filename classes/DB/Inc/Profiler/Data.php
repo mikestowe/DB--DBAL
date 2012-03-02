@@ -25,6 +25,10 @@ class DB_Inc_Profiler_Data {
         return $this->_memory;
     }
     
+    public function getMemoryUsage() {
+        return $this->_memory;
+    }
+    
     /*
      * SHORT NAMES
      */

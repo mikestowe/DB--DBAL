@@ -238,6 +238,14 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler
         return DB::profiler()->getStack($this->_identifier);
     }
     
+    public function profilerShowLargerThan($memory) {
+        return DB::profiler()->getQueriesLargerThan($this->_identifier, $memory);
+    }
+    
+    public function profilerShowLongerThan($seconds) {
+        return DB::profiler()->getQueriesLongerThan($this->_identifier, $seconds);
+    }
+    
     public function __get($key) {
     	return $this->getData($key);
     }

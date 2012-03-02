@@ -82,6 +82,31 @@ DB::MySQL()->table('cow')->insert(array('name' => 'Mike'))->save();
 DB::MySQL()->profilerEnd();
 
 echo '<hr />';
+echo 'LARGE QUERIES:<br />';
+echo 'QUERY | TIME TAKEN | MEMORY USED<br />';
+foreach(DB::MySQL()->profilerShowLargerThan(1000) as $profile) {
+    echo $profile->getQuery();
+    echo ' | ';
+    echo $profile->getExecutionTime();
+    echo ' | ';
+    echo $profile->getMemoryUsed();
+    echo '<br />';
+}
+
+echo '<hr />';
+echo 'LONG QUERIES:<br />';
+echo 'QUERY | TIME TAKEN | MEMORY USED<br />';
+foreach(DB::MySQL()->profilerShowLongerThan(.01) as $profile) {
+    echo $profile->getQuery();
+    echo ' | ';
+    echo $profile->getExecutionTime();
+    echo ' | ';
+    echo $profile->getMemoryUsed();
+    echo '<br />';
+}
+
+echo '<hr />';
+echo 'ALL QUERIES:<br />';
 echo 'QUERY | TIME TAKEN | MEMORY USED<br />';
 foreach(DB::MySQL()->profilerShow() as $profile) {
     echo $profile->getQuery();
