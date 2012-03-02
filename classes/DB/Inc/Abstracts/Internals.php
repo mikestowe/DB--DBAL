@@ -222,4 +222,37 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler
     public function __unset($key) {
     	unset($this->_data['new'][$key]);
     }
+    
+    /**
+     * Magic Find Methods
+     */
+    public function __call($function, $parameters) {
+        if(preg_match('/^(find(One)?)/i', $function, $do)) {
+            preg_match_all('#(AndBy|OrBy|By)(.+?)(?=AndBy|OrBy|$)#', $function, $matches);
+            $checks = count($matches[0]);
+            if($checks != count($parameters)) {
+                throw new Exception(sprintf('Method %s expects %d arguments, %d given.', $function, $checks, count($parameters)));
+            }
+            
+            for($i = 0; $i != $checks; $i++) {
+                if($i == 0) {
+                    $this->where(strtolower($matches[2][$i]) . ' = "?"', $parameters[$i]);
+                } elseif ($matches[1][$i] == 'AndBy') {
+                    $this->andWhere(strtolower($matches[2][$i]) . ' = "?"', $parameters[$i]);
+                } elseif ($matches[1][$i] == 'OrBy') {
+                    $this->orWhere(strtolower($matches[2][$i]) . ' = "?"', $parameters[$i]);
+                } else {
+                    throw new Exception('Method ' . $function . ' does not exist');
+                }
+            }
+            
+            if($do[0] == 'findOne') {
+                return $this->fetchOne();
+            } else {
+                return $this->fetch();
+            }
+        }
+
+        parent::__call($function, $parameters);
+    }
 }

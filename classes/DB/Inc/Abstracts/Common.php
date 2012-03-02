@@ -180,7 +180,7 @@ class DB_Inc_Abstracts_Common extends DB_Inc_Abstracts_Internals implements DB_I
         return $this;
     }
     
-    public function fetch($start,$records=null) {
+    public function fetch($start=null ,$records=null) {
         $this->limit($start,$records);
         $this->_query['format'] = 'array';
         $this->_query['type'] = 'update';

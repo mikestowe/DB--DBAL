@@ -5,6 +5,10 @@ require_once('classes/DB.php');
 // Setup a Connection (saving it is optional)
 DB::MySQL('localhost','root','')->saveConnectionAs('default');
 
+// Find Using Magic Find Method
+$a = DB::MySQL()->db('DBAL')->table('test')->findByName('Bob');
+echo $a[0]->name . '<hr />';
+
 // Select a Database, Table, and Query It
 $a = DB::MySQL()->db('DBAL')->table('test')->select()->where('1=1')->fetchOne(); // fetchOne retains state
 
