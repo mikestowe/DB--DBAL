@@ -202,7 +202,10 @@ class DB_Firebird extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_D
 	}
 	
 	public function doRawQuery($query) {
-		return ibase_query(self::getConnection(), $query);
+	    $this->profilerStartRecording();
+		$r = ibase_query(self::getConnection(), $query);
+        $this->profilerEndRecording($query);
+        return $r;
 	}
 	
 	/* TRANSACTION FUNCTIONS */

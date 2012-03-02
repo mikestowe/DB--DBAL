@@ -5,6 +5,8 @@ require_once('classes/DB.php');
 // Setup a Connection (saving it is optional)
 DB::MySQL('localhost','root','')->saveConnectionAs('default');
 
+DB::MySQL()->profilerStart();
+
 // Find Using Magic Find Method
 $a = DB::MySQL()->db('DBAL')->table('test')->findByName('Bob');
 echo $a[0]->name . '<hr />';
@@ -76,4 +78,17 @@ foreach($c as $v) {
 
 // Now let's add a name
 DB::MySQL()->table('cow')->insert(array('name' => 'Mike'))->save();
+
+DB::MySQL()->profilerEnd();
+
+echo '<hr />';
+echo 'QUERY | TIME TAKEN | MEMORY USED<br />';
+foreach(DB::MySQL()->profilerShow() as $profile) {
+    echo $profile->getQuery();
+    echo ' | ';
+    echo $profile->getExecutionTime();
+    echo ' | ';
+    echo $profile->getMemoryUsed();
+    echo '<br />';
+}
 ?>

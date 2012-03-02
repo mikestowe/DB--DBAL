@@ -25,6 +25,7 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler
     	'data'		=>  array(),
     );
     protected $_resource;
+    private $_profiler;
 
     public function __construct($function, $connection = false, $database = null)
     {
@@ -205,6 +206,36 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler
     
     public function clearCache() {
     	DB::cacheManager()->clearCache($this->_database, $this->_query['table']['name']);
+    }
+    
+    public function profilerStartRecording() {
+        
+        if(!DB::profiler()->getStatus($this->_identifier)) { return; }
+        $this->_profiler['time'] = microtime(true);
+        $this->_profiler['memory'] = memory_get_usage();
+    }
+    
+    public function profilerEndRecording($query) {
+        if(!DB::profiler()->getStatus($this->_identifier)) { return; }
+        DB::profiler()->addToStack($this->_identifier, 
+                                                $query, 
+                                                (microtime(true) - $this->_profiler['time']),
+                                                (memory_get_usage() - $this->_profiler['memory']));
+    }
+    
+    public function profilerStart() {
+        DB::profiler()->setStatus($this->_identifier, true);
+        DB::profiler()->clearStack($this->_identifier);
+        return $this;
+    }
+    
+    public function profilerEnd() {
+        DB::profiler()->setStatus($this->_identifier, false);
+        return $this;
+    }
+    
+    public function profilerShow() {
+        return DB::profiler()->getStack($this->_identifier);
     }
     
     public function __get($key) {

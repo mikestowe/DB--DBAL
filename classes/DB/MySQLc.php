@@ -197,7 +197,10 @@ class DB_MySQLc extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_Dat
 	}
 	
 	public function doRawQuery($query) {
-		return mysql_query($query);
+		$this->profilerStartRecording();
+        $r = mysql_query($query);
+        $this->profilerEndRecording($query);
+        return $r;
 	}
 	
 	/* TRANSACTION FUNCTIONS */

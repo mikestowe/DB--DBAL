@@ -196,7 +196,10 @@ class DB_MySQLi extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_Dat
 	}
 	
 	public function doRawQuery($query) {
-		return mysqli_query(self::getConnection(), $query);
+	    $this->profilerStartRecording();
+		$r = mysqli_query(self::getConnection(), $query);
+        $this->profilerEndRecording($query);
+        return $r;
 	}
 	
 	/* TRANSACTION FUNCTIONS */

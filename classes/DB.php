@@ -15,6 +15,7 @@ class DB
 	private static $_instance;
     private $_connections = array();
     private $_cache;
+    private $_profiler;
     
     public function __construct() 
     {
@@ -85,6 +86,17 @@ class DB
     public static function cacheManager()
     {
     	return self::getInstance()->_cache;
+    }
+    
+    public static function profiler()
+    {
+        $self = self::getInstance();
+        if(is_null($self->_profiler)) {
+            require_once('DB/Inc/Profiler/Profiler.php');
+            require_once('DB/Inc/Profiler/Data.php');
+            $self->_profiler = new DB_Inc_Profiler_Profiler();
+        }
+        return $self->_profiler;
     }
     
     public static function getPath()
