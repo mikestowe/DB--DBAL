@@ -227,7 +227,7 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler
      * Magic Find Methods
      */
     public function __call($function, $parameters) {
-        if(preg_match('/^(find(One)?)/i', $function, $do)) {
+        if(preg_match('/^(find(One)?)/', $function, $do)) {
             preg_match_all('#(AndBy|OrBy|By)(.+?)(?=AndBy|OrBy|$)#', $function, $matches);
             $checks = count($matches[0]);
             if($checks != count($parameters)) {
