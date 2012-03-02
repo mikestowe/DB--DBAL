@@ -120,7 +120,7 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler
         return $this->_data[$type];
     }
     
-    public function setQuerySQL($sql)
+    protected function setQuerySQL($sql)
     {
         $this->saveData('querySQL', $sql, 'internals');
         return $this;
@@ -131,7 +131,7 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler
         return $this->getData('querySQL', 'internals');
     }
     
-    public function setInsertId($id)
+    protected function setInsertId($id)
     {
     	if(!is_int($id)) { throw new InvalidArgumentException('setInsertId expects ID to be an integer'); }
         $this->saveData('insertId', $id, 'internals');
@@ -143,7 +143,7 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler
         return $this->getData('insertId', 'internals');
     }
     
-    public function setAffectedRows($numRows)
+    protected function setAffectedRows($numRows)
     {
     	if(!is_int($numRows)) { throw new InvalidArgumentException('setAffectedRows expects numRows to be an integer'); }
         $this->saveData('affectedRows', $numRows, 'internals');
@@ -155,7 +155,7 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler
         return $this->getData('affectedRows', 'internals');
     }
     
-    public function setCount($numRows)
+    protected function setCount($numRows)
     {
     	if(!is_int($numRows)) { throw new InvalidArgumentException('setCount expects numRows to be an integer'); }
         $this->saveData('count', $numRows, 'internals');
@@ -172,7 +172,7 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler
         var_dump(DB::getInstance()->getConnections($this->_identifier));
     }
     
-    public function newDataSet($primaryKey, $data) {
+    protected function newDataSet($primaryKey, $data) {
     	$obj = clone $this;
     	foreach($data as $k => $v) {
     		$obj->$k = $v;
@@ -188,11 +188,11 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler
     	return $obj;
     }
     
-    public function getCache($query) {
+    protected function getCache($query) {
     	return DB::cacheManager()->getCache($this->_database, $this->_query['table']['name'], DB::cacheManager()->makeKey($query));
     }
     
-    public function setCache($query, $data) {
+    protected function setCache($query, $data) {
     	return DB::cacheManager()->setCache($this->_database, $this->_query['table']['name'], DB::cacheManager()->makeKey($query), $data);
     }
     
@@ -208,14 +208,14 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler
     	DB::cacheManager()->clearCache($this->_database, $this->_query['table']['name']);
     }
     
-    public function profilerStartRecording() {
+    protected function profilerStartRecording() {
         
         if(!DB::profiler()->getStatus($this->_identifier)) { return; }
         $this->_profiler['time'] = microtime(true);
         $this->_profiler['memory'] = memory_get_usage();
     }
     
-    public function profilerEndRecording($query) {
+    protected function profilerEndRecording($query) {
         if(!DB::profiler()->getStatus($this->_identifier)) { return; }
         DB::profiler()->addToStack($this->_identifier, 
                                                 $query, 
