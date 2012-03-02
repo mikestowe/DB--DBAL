@@ -9,7 +9,7 @@ class DB_Inc_Abstracts_Common extends DB_Inc_Abstracts_Internals implements DB_I
     public function table($table, $shortname = null) {
         $this->_query['table']['name'] = $table;
         $this->_query['table']['shortname'] = $shortname;
-
+        $this->handleSetup();
         return $this;
     }
 
