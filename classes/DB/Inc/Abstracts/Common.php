@@ -101,7 +101,7 @@ class DB_Inc_Abstracts_Common extends DB_Inc_Abstracts_Internals implements DB_I
         return call_user_func_array(array(&$this, 'where'), $args);
     }
 
-    public function resetWhere() {
+    public function removeWhere() {
         $this->_query['where'] = array();
         $this->_query['whereType'] = '';
         return $this;
@@ -112,7 +112,7 @@ class DB_Inc_Abstracts_Common extends DB_Inc_Abstracts_Internals implements DB_I
         return $this;
     }
     
-    public function resetOrderBy($orderby) {
+    public function removeOrderBy($orderby) {
         $this->_query['orderby'] = array();
         return $this;
     }
@@ -122,7 +122,7 @@ class DB_Inc_Abstracts_Common extends DB_Inc_Abstracts_Internals implements DB_I
         return $this;
     }
     
-    public function resetGroupBy($groupby) {
+    public function removeGroupBy($groupby) {
         $this->_query['groupby'] = array();
         return $this;
     }
