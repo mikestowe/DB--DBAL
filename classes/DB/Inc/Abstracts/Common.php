@@ -111,9 +111,19 @@ class DB_Inc_Abstracts_Common extends DB_Inc_Abstracts_Internals implements DB_I
         $this->_query['orderby'][] = $orderby;
         return $this;
     }
+    
+    public function resetOrderBy($orderby) {
+        $this->_query['orderby'] = array();
+        return $this;
+    }
 
     public function groupBy($groupby) {
         $this->_query['groupby'][] = $groupby;
+        return $this;
+    }
+    
+    public function resetGroupBy($groupby) {
+        $this->_query['groupby'] = array();
         return $this;
     }
 
