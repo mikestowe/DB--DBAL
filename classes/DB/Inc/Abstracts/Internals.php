@@ -152,7 +152,7 @@ class DB_Inc_Abstracts_Internals extends DB_Inc_Abstracts_DataHandler {
         if ($primaryKey === false) {
             $obj->_query['noPrimary'] = true;
         } else {
-            $obj->resetWhere()->where($primaryKey . ' = ?', $data->$primaryKey);
+            $obj->removeWhere()->where($primaryKey . ' = ?', $data->$primaryKey);
         }
 
         return $obj;
