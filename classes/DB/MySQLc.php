@@ -39,38 +39,40 @@ class DB_MySQLc extends DB_Inc_Abstracts_Common implements DB_Inc_Interfaces_Dat
     }
 
     public function execute($getOldData = true) {
-        if (!parent::getAllData('old') && $getOldData && $this->_query['type'] == 'update') {
-            $tmp = clone $this;
-            $tmp->select('*');
-            $a = $tmp->fetchOne();
-            foreach ($a as $key => $value) {
-                parent::saveData($key, $value, 'old');
-            }
-        }
-
-        $query = ($this->_query['type'] == 'insert' ? 'INSERT INTO' : 'UPDATE') . ' `' . $this->_query['table']['name'] . '` SET';
-
-        if (isset($this->_query['smart_update']) && $this->_query['smart_update'] && $this->_query['type'] == 'update') {
-            $this->_query['data'] = array();
-            foreach ($this->getAllData() as $k => $v) {
-                if ($v != parent::getData($k, 'old')) {
-                    $this->_query['data'][$k] = $v;
+        if($this->_query['type'] != 'delete') {
+            if (!parent::getAllData('old') && $getOldData && $this->_query['type'] == 'update') {
+                $tmp = clone $this;
+                $tmp->select('*');
+                $a = $tmp->fetchOne();
+                foreach ($a as $key => $value) {
+                    parent::saveData($key, $value, 'old');
                 }
             }
-        }
-
-        if (is_array($this->_query['data']) && count($this->_query['data']) > 0) {
-            foreach ($this->_query['data'] as $k => $v) {
-                $query .= ' ' . $k . ' = "' . $this->quote($v) . '",';
-                if ($getOldData && parent::getData($k, 'old') != $v) {
-                    parent::saveData($k, array('old' => parent::getData($k, 'old'), 'new' => $v), 'changed');
+    
+            $query = ($this->_query['type'] == 'insert' ? 'INSERT INTO' : 'UPDATE') . ' `' . $this->_query['table']['name'] . '` SET';
+    
+            if (isset($this->_query['smart_update']) && $this->_query['smart_update'] && $this->_query['type'] == 'update') {
+                $this->_query['data'] = array();
+                foreach ($this->getAllData() as $k => $v) {
+                    if ($v != parent::getData($k, 'old')) {
+                        $this->_query['data'][$k] = $v;
+                    }
                 }
             }
-            $query = substr($query, 0, -1);
-        } elseif (is_string($this->_query['data'])) {
-            $query .= ' ' . $this->_query['data'];
-        } else {
-            return false;
+    
+            if (is_array($this->_query['data']) && count($this->_query['data']) > 0) {
+                foreach ($this->_query['data'] as $k => $v) {
+                    $query .= ' ' . $k . ' = "' . $this->quote($v) . '",';
+                    if ($getOldData && parent::getData($k, 'old') != $v) {
+                        parent::saveData($k, array('old' => parent::getData($k, 'old'), 'new' => $v), 'changed');
+                    }
+                }
+                $query = substr($query, 0, -1);
+            } elseif (is_string($this->_query['data'])) {
+                $query .= ' ' . $this->_query['data'];
+            } else {
+                return false;
+            }
         }
 
         if ($this->_query['type'] != 'insert') {

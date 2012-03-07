@@ -149,7 +149,9 @@ class DB_Inc_Abstracts_Common extends DB_Inc_Abstracts_Internals implements DB_I
         }
 
         $this->handlePreSave();
-        if ($this->_query['type'] == 'insert') {
+        if ($this->_query['type'] == 'delete') {
+            $this->handlePreDelete();
+        } elseif ($this->_query['type'] == 'insert') {
             $this->handlePreInsert();
         } else {
             $this->handlePreUpdate();
@@ -166,7 +168,9 @@ class DB_Inc_Abstracts_Common extends DB_Inc_Abstracts_Internals implements DB_I
         $this->execute($getOldData);
 
         $this->handlePostSave();
-        if ($this->_query['type'] == 'insert') {
+        if ($this->_query['type'] == 'delete') {
+            $this->handlePostDelete();
+        } if ($this->_query['type'] == 'insert') {
             $this->handlePostInsert();
         } else {
             $this->handlePostUpdate();
